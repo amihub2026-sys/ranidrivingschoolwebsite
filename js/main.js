@@ -249,4 +249,331 @@
         }, 100);
     });
 
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const openButton =
+        document.getElementById('openEnrollForm');
+
+    const closeButton =
+        document.getElementById('closeEnrollForm');
+
+    const modal =
+        document.getElementById('enrollModal');
+
+    const overlay =
+        document.getElementById('enrollModalOverlay');
+
+    const form =
+        document.getElementById('enrollmentForm');
+
+    const phoneInput =
+        document.getElementById('studentPhone');
+
+    const dobInput =
+        document.getElementById('studentDob');
+
+    const classSelect =
+        document.getElementById('drivingClass');
+
+    const otherField =
+        document.getElementById('otherInterestField');
+
+    const otherInput =
+        document.getElementById('otherInterest');
+
+
+    if (
+        !openButton ||
+        !closeButton ||
+        !modal ||
+        !overlay ||
+        !form
+    ) {
+        console.error(
+            'Enrollment form elements are missing from the HTML.'
+        );
+
+        return;
+    }
+
+
+  function openEnrollmentModal(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    // Stop the header carousel
+    $('.header-carousel').trigger(
+        'stop.owl.autoplay'
+    );
+
+    modal.classList.add('active');
+
+    document.body.classList.add(
+        'enroll-modal-open'
+    );
+
+    setTimeout(function () {
+        document
+            .getElementById('studentName')
+            .focus();
+    }, 300);
+}
+
+
+
+  function closeEnrollmentModal() {
+    modal.classList.remove('active');
+
+    document.body.classList.remove(
+        'enroll-modal-open'
+    );
+
+    // Start the header carousel again
+    $('.header-carousel').trigger(
+        'play.owl.autoplay',
+        [3500]
+    );
+}
+
+
+    openButton.addEventListener(
+        'click',
+        openEnrollmentModal
+    );
+
+
+    closeButton.addEventListener(
+        'click',
+        closeEnrollmentModal
+    );
+
+
+    overlay.addEventListener(
+        'click',
+        closeEnrollmentModal
+    );
+
+
+    document.addEventListener(
+        'keydown',
+        function (event) {
+            if (
+                event.key === 'Escape' &&
+                modal.classList.contains('active')
+            ) {
+                closeEnrollmentModal();
+            }
+        }
+    );
+
+
+    // Do not allow a future DOB
+    const today =
+        new Date().toISOString().split('T')[0];
+
+    dobInput.setAttribute('max', today);
+
+
+    // Allow only 10 numbers
+    phoneInput.addEventListener(
+        'input',
+        function () {
+            this.value = this.value
+                .replace(/\D/g, '')
+                .slice(0, 10);
+        }
+    );
+
+
+    // Show the Others field
+    classSelect.addEventListener(
+        'change',
+        function () {
+            if (this.value === 'Others') {
+                otherField.classList.add('active');
+                otherInput.required = true;
+            } else {
+                otherField.classList.remove('active');
+                otherInput.required = false;
+                otherInput.value = '';
+            }
+        }
+    );
+
+
+    // Send details to WhatsApp
+    form.addEventListener(
+        'submit',
+        function (event) {
+            event.preventDefault();
+
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+
+            const name =
+                document
+                    .getElementById('studentName')
+                    .value
+                    .trim();
+
+            const dob =
+                dobInput.value;
+
+            const phone =
+                phoneInput.value.trim();
+
+            let selectedClass =
+                classSelect.value;
+
+
+            if (selectedClass === 'Others') {
+                selectedClass =
+                    otherInput.value.trim();
+            }
+
+
+            const dobParts =
+                dob.split('-');
+
+            const formattedDob =
+                dobParts[2] +
+                '/' +
+                dobParts[1] +
+                '/' +
+                dobParts[0];
+
+
+            const message =
+`Hello Rani Driving School,
+
+I would like to enrol for driving training.
+
+Name: ${name}
+Date of Birth: ${formattedDob}
+Phone Number: ${phone}
+Interested In: ${selectedClass}
+
+Please contact me with further details.`;
+
+
+            // WhatsApp number: 75500 08588
+            const whatsappNumber =
+                '917550008588';
+
+
+            const whatsappUrl =
+                'https://wa.me/' +
+                whatsappNumber +
+                '?text=' +
+                encodeURIComponent(message);
+
+
+            window.open(
+                whatsappUrl,
+                '_blank'
+            );
+        }
+    );
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const faqItems =
+        document.querySelectorAll('.rds-faq-item');
+
+    const faqRevealElements =
+        document.querySelectorAll('.rds-faq-reveal');
+
+
+    // =====================================
+    // FAQ ACCORDION
+    // =====================================
+
+    faqItems.forEach(function (item) {
+        const question =
+            item.querySelector('.rds-faq-question');
+
+        question.addEventListener('click', function () {
+            const isAlreadyOpen =
+                item.classList.contains('active');
+
+
+            // Close every FAQ
+            faqItems.forEach(function (faq) {
+                faq.classList.remove('active');
+
+                faq
+                    .querySelector('.rds-faq-question')
+                    .setAttribute(
+                        'aria-expanded',
+                        'false'
+                    );
+            });
+
+
+            // Open clicked FAQ
+            if (!isAlreadyOpen) {
+                item.classList.add('active');
+
+                question.setAttribute(
+                    'aria-expanded',
+                    'true'
+                );
+            }
+        });
+    });
+
+
+    // =====================================
+    // STAGGERED SCROLL REVEAL
+    // =====================================
+
+    faqRevealElements.forEach(function (element, index) {
+        element.style.transitionDelay =
+            Math.min(index * 90, 450) + 'ms';
+    });
+
+
+    if ('IntersectionObserver' in window) {
+        const faqObserver =
+            new IntersectionObserver(
+                function (entries, observer) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add(
+                                'rds-faq-visible'
+                            );
+
+                            observer.unobserve(
+                                entry.target
+                            );
+                        }
+                    });
+                },
+                {
+                    threshold: 0.15
+                }
+            );
+
+
+        faqRevealElements.forEach(function (element) {
+            faqObserver.observe(element);
+        });
+    } else {
+        faqRevealElements.forEach(function (element) {
+            element.classList.add(
+                'rds-faq-visible'
+            );
+        });
+    }
+});
+
 })(jQuery);
+
+
