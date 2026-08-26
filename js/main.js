@@ -464,7 +464,7 @@ Please contact me with further details.`;
 
             // WhatsApp number: 75500 08588
             const whatsappNumber =
-                '917550008588';
+                '919842952188';
 
 
             const whatsappUrl =
